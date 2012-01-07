@@ -10,5 +10,9 @@
     Here is your request history
     %ul
       - @requests.each do |request| 
-        %li= request[:params]
+        %li
+          = request[:params]['REQUEST_METHOD'] 
+          = request[:params]['PATH_INFO'] 
+          %br
+          = request[:params]
     
