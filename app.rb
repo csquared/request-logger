@@ -1,7 +1,7 @@
 require 'bundler'
 Bundler.require
 
-ENV['APP_URL'] ||= 'http://request-logger.herokuapp.com/'
+ENV['APP_URL'] ||= 'https://request-logger.herokuapp.com/request/'
 ENV.use(SmartEnv::UriProxy)
 STDOUT.sync = true
 DB   = Sequel.connect ENV['DATABASE_URL'].to_s
