@@ -97,7 +97,7 @@ class App < Sinatra::Base
     DB[:resources].insert(:id => username, :plan => json_body['plan'], :status => "active")
 
     status 201
-    {id: username, config: {"REQUEST_LOGGER_URL" => ENV['APP_URL'] + 'request/' + username}}.to_json
+    {id: username, config: {"REQUEST_LOGGER_URL" => ENV['APP_URL'] + username}}.to_json
   end
 
   # deprovision
