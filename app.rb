@@ -43,7 +43,9 @@ class App < Sinatra::Base
     DB[:requests].insert(:resource_id => params[:id], :params => params.to_json)
     
     if params['REQUEST_METHOD'] == 'GET' && params['QUERY_STRING'].include?('post=true')
-      {:REQUEST_METHOD => 'POST', :body => params['QUERY_STRING'].gsub('post=true','')}.to_json
+      {:REQUEST_METHOD => 'POST', 
+       :QUERY_STRING => '',
+       :body => params['QUERY_STRING'].gsub(/post=true/,'')}.to_json
     else
       {}.to_json
     end
