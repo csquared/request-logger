@@ -1,27 +1,20 @@
-## `kensa create my_addon --template sinatra`
+# Request Logger
 
-this repository is a sinatra template application for use with the 
-Heroku <a href="http://github.com/heroku/kensa">kensa</a> gem
+this is demo add-on that shows how one could log and modify an HTTP request
+before it hits a Heroku application.
 
-clone it via:
+# Installation
 
-    > gem install kensa
-    > kensa create my_addon --template sinatra
-    > cd my_addon
-    > bundle install
-    > foreman start
+it expects the user to install my rack-cgi-proxy and configure it via:
 
-In a new window: 
+  Gemfile:
 
-    > cd my_addon
-    > kensa test provision
-    > kensa sso 1
+    gem 'rack-cgi-proxy', :git => 'git://github.com/csquared/rack-cgi-proxy.git'
 
-And you should be in a Heroku Single Sign On sesion for your brand new addon! 
+  config.ru
 
-## Current status: 
-- deprovision - working
-- provision   - working
-- planchange  - working
-- GET SSO     - working
-- POST SSO    - working
+    use Rack::CgiProxy, ENV['REQUEST_LOGGER_URL']
+
+  Install Add-on
+
+    heroku addons:add request-logger
