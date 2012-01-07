@@ -40,7 +40,7 @@ class App < Sinatra::Base
   end
 
   post '/request/:id' do
-    DB[:request].insert(:resource_id => params[:id], :params => params.to_json)
+    DB[:requests].insert(:resource_id => params[:id], :params => params.to_json)
     {}.to_json
   end
   
