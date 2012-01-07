@@ -6,4 +6,9 @@
     %p Hello!
     %p You are using resource #{@resource.inspect}
     %p You logged in with email #{@email}
+
+    Here is your request history
+    %ul
+      - @requests.each do |request| 
+        %li= request[:params]
     

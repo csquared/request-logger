@@ -56,6 +56,7 @@ class App < Sinatra::Base
     halt 403, 'not logged in' unless session[:heroku_sso]
     #response.set_cookie('heroku-nav-data', value: session[:heroku_sso])
     @resource = DB[:resources].filter(:id => session[:resource]).first
+    @requests = DB[:requests].filter(:resource_id => @resource[:id])
     halt 404 if @resource[:status] == 'inactive'
     @email    = session[:email]
     haml :index
