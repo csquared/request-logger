@@ -1,14 +1,13 @@
 require 'bundler'
 Bundler.require
 
+ENV['APP_URL'] ||= 'http://request-logger.herokuapp.com/'
+ENV.use(SmartEnv::UriProxy)
 STDOUT.sync = true
+DB   = Sequel.connect ENV['DATABASE_URL'].to_s
 
 class App < Sinatra::Base
   use Rack::Session::Cookie, secret: ENV['SSO_SALT']
-
-  @@resources = []
-
-  Resource = Class.new(OpenStruct)
 
   helpers do
     def protected!
@@ -38,17 +37,19 @@ class App < Sinatra::Base
     def json_body
       @json_body || (body = request.body.read && JSON.parse(body))
     end
+  end
 
-    def get_resource
-      @@resources.find {|u| u.id == params[:id].to_i } or halt 404, 'resource not found'
-    end
+  post '/request/:id' do
+    DB[:request].insert(:resource_id => params[:id], :params => params.to_json)
+    {}.to_json
   end
   
   # sso landing page
   get "/" do
     halt 403, 'not logged in' unless session[:heroku_sso]
     #response.set_cookie('heroku-nav-data', value: session[:heroku_sso])
-    @resource = session[:resource]
+    @resource = DB[:resources].filter(:id => session[:resource]).first
+    halt 404 if @resource[:status] == 'inactive'
     @email    = session[:email]
     haml :index
   end
@@ -59,7 +60,8 @@ class App < Sinatra::Base
     halt 403 if token != params[:token]
     halt 403 if params[:timestamp].to_i < (Time.now - 2*60).to_i
 
-    halt 404 unless session[:resource]   = get_resource
+   # halt 404 unless 
+    session[:resource]   = params[:id]
 
     response.set_cookie('heroku-nav-data', value: params['nav-data'])
     session[:heroku_sso] = params['nav-data']
@@ -83,27 +85,25 @@ class App < Sinatra::Base
   post '/heroku/resources' do
     show_request
     protected!
+    
+    username = "user_" + SecureRandom.hex(10)
+    DB[:resources].insert(:id => username, :plan => json_body['plan'], :status => "active")
+
     status 201
-    resource = Resource.new(:id => @@resources.size + 1, 
-                            :plan => json_body.fetch('plan', 'test'))
-    @@resources << resource
-    {id: resource.id, config: {"MYADDON_URL" => 'http://user.yourapp.com'}}.to_json
+    {id: username, config: {"REQUEST_LOGGER_URL" => ENV['APP_URL'] + 'request/' + username}}.to_json
   end
 
   # deprovision
   delete '/heroku/resources/:id' do
     show_request
-    protected!
-    @@resources.delete(get_resource)
-    "ok"
+    DB[:resources].filter(:id => params[:id]).update(:status => "inactive")
   end
 
   # plan change
   put '/heroku/resources/:id' do
     show_request
     protected!
-    resource = get_resource 
-    resource.plan = json_body['plan']
+    DB[:resources].filter(:id => params[:id]).update(:plan => json_body['plan'])
     "ok"
   end
 end
