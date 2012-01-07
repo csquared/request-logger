@@ -47,7 +47,7 @@ class App < Sinatra::Base
     if params['REQUEST_METHOD'] == 'GET' && params['QUERY_STRING'].include?('post=true')
       {:REQUEST_METHOD => 'POST', 
        :QUERY_STRING => '',
-       :PATH_INFO => fix.call(params['PATH_INFO'])
+       :PATH_INFO => fix.call(params['PATH_INFO']),
        :body => fix.call(params['QUERY_STRING'])}.to_json
     else
       {}.to_json
