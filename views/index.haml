@@ -10,9 +10,10 @@
     Here is your request history
     %ul
       - @requests.each do |request| 
+        - req_data = JSON.parse(request[:params])
         %li
-          = request[:params]['REQUEST_METHOD'] 
-          = request[:params]['PATH_INFO'] 
+          = req_data['REQUEST_METHOD'] 
+          = req_data['PATH_INFO'] 
           %br
           = request[:params]
     
