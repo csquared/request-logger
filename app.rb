@@ -104,6 +104,7 @@ class App < Sinatra::Base
   delete '/heroku/resources/:id' do
     show_request
     DB[:resources].filter(:id => params[:id]).update(:status => "inactive")
+    "ok"
   end
 
   # plan change
