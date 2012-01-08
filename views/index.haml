@@ -14,6 +14,7 @@
         %li
           = req_data['REQUEST_METHOD'] 
           = req_data['PATH_INFO'] + (req_data['QUERY_STRING'].empty? ? '' : '?' + req_data['QUERY_STRING'])
+          %br
           -if request[:time]
             = request[:time]
             %br
