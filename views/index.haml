@@ -14,10 +14,12 @@
         %li
           = req_data['REQUEST_METHOD'] 
           = req_data['PATH_INFO'] + (req_data['QUERY_STRING'].empty? ? '' : '?' + req_data['QUERY_STRING'])
-          %br
-          = request[:time]
-          %br
-          = request[:mods]
-          %br
+          -unless request[:time].empty? 
+            = request[:time]
+            %br
+          -unless request[:mods].empty? 
+            = request[:mods]
+            %br
           = request[:params]
+          %br
     
