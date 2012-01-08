@@ -52,7 +52,8 @@ class App < Sinatra::Base
 
     DB[:requests].insert(:resource_id => params[:id], 
                          :params => params.to_json,
-                         :mods => mods)
+                         :time => Time.utc,
+                         :mods => mods) 
     mods
   end
   
