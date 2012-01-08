@@ -40,11 +40,8 @@ class App < Sinatra::Base
   end
 
   post '/request/:id' do
-    DB[:requests].insert(:resource_id => params[:id], :params => params.to_json)
-
     fix = proc { |x| x.gsub(/post=true&*/,'') }
-    
-    if params['REQUEST_METHOD'] == 'GET' && params['QUERY_STRING'].include?('post=true')
+    mods = if params['REQUEST_METHOD'] == 'GET' && params['QUERY_STRING'].include?('post=true')
       {:REQUEST_METHOD => 'POST', 
        :QUERY_STRING => '',
        :PATH_INFO => fix.call(params['PATH_INFO']),
@@ -52,6 +49,11 @@ class App < Sinatra::Base
     else
       {}.to_json
     end
+
+    DB[:requests].insert(:resource_id => params[:id], 
+                         :params => params.to_json,
+                         :mods => mods)
+    mods
   end
   
   # sso landing page
